@@ -1,0 +1,1 @@
+var myGame = new Phaser.Game(200,300,Phaser.AUTO,'gameFrame');
