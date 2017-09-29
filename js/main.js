@@ -1,10 +1,12 @@
 var game = new Phaser.Game(800,533,Phaser.AUTO,'gameFrame');
 var _link;
+var _hearts;
 var cursores;
 var estadoPrincipal = {
   preload:function(){//cargamos los assets
       game.load.image('bg','img/Ground.png');
       game.load.spritesheet('link_anim','img/link.png',120,130);
+      game.load.image('hearts','img/hearts.png');
   },
   create:function(){//pintamos los assets
       cursores =game.input.keyboard.createCursorKeys();
@@ -16,6 +18,8 @@ var estadoPrincipal = {
       _link.animations.add('up',[20,21,22,23,24,25,26,27,28,29],20,true);
       _link.animations.add('right',[30,31,32,33,34,35,36,37,38,39],20,true);
       _link.anchor.setTo(0.5,0.5);
+      _hearts=game.add.sprite(0,0,'hearts');
+      _hearts.scale.setTo(0.10);
   },
   update:function(){//actualizamos los assets
       if(cursores.down.isDown){
