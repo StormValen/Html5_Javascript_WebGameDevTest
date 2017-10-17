@@ -16,6 +16,8 @@ preload:function(){
     //BALA
     this.game.load.image('bullet','img/spr_bullet_0.png');
     this.game.load.spritesheet('enemy_medium','img/enemy-medium.png',32,16);
+    
+    this.game.load.spritesheet('explosion','img/explosion.png',20,16);
     this.game.load.audio('shoot','sounds/snd_shoot.mp3');
 },
 create:function(){
@@ -37,11 +39,13 @@ create:function(){
     
     this.game.physics.arcade.enable(this.nave);
     this.nave.body.collideWorldBounds = true;
+    
     this.loadBullets();
     this.loadEnemy();
+    this.loadExplosions();
+    
     this.shootingTimer = this.game.time.events.loop(Phaser.Timer.SECOND/2,this.createBullet,this);
     this.shootingTimer = this.game.time.events.loop(Phaser.Timer.SECOND*4,this.createEnemy_Medium,this);
-    //this.createEnemy_Medium();
     this.shoot = this.add.audio('shoot');
 },
 update:function(){
@@ -68,6 +72,8 @@ update:function(){
     if(cursores.up.isDown){
        this.nave.body.velocity.y -=2.2;
     }
+    
+    this.game.physics.arcade.overlap(this.bullets,this.enemies,this.choque,null,this)
 },
 loadEnemy:function(){
     this.enemies = this.add.group();
@@ -76,6 +82,9 @@ loadEnemy:function(){
 loadBullets:function(){
     this.bullets = this.add.group();
     this.bullets.enableBody = true;
+},
+loadExplosions:function(){
+    this.explosions = this.add.group();    
 },
 createBullet:function(){
     var bullet = this.bullets.getFirstExists(false);
@@ -103,5 +112,20 @@ createEnemy_Medium:function(){
     
 
     enemy_medium.body.velocity.y = 50;
+},
+    createExplosion:function(X,Y){
+    var explosion = this.explosions.getFirstExists(false);
+    if(!explosion){
+        explosion = new shooter2D.explosion_prefab(this.game,X,Y);
+        this.explosions.add(explosion);
+    }else{
+        explosion.reset(_x,_y);
+    }
+        explosion.animations.play('stand');
+},
+choque:function(bullet,enemy){
+    bullet.kill();
+    enemy.kill();
+    this.createExplosion(bullet.position.x,bullet.position.y);
 }
 };
