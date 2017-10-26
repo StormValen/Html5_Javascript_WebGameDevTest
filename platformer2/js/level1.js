@@ -20,6 +20,10 @@ platformer.level1 = {
         this.load.spritesheet('hero','img/hero.png',32,32);
         
         this.load.image('entry','img/spr_door_closed_0.png');
+        
+        this.load.spritesheet('jumper','img/jumper.png',32,32);
+        this.load.spritesheet('slime','img/slime.png',32,32);
+        this.load.spritesheet('energy','img/energy.png',128,28);
     },
     create:function(){
         this.bg = this.game.add.tileSprite(0,0,gameOptions.level1Width,gameOptions.level1Height,'bg');
@@ -41,51 +45,57 @@ platformer.level1 = {
         this.hero.animations.add("run",[1,2,3,4],10,true);
         this.game.physics.arcade.enable(this.hero);
         
+        this.hero.energy = 6;
+        this.energy = this.game.add.sprite(10,10,'energy',this.hero.energy);
+        this.energy.fixedToCamera = true;
+        
+        this.hero.hit = function(){
+            this.reset(65,100);
+            platformer.level1.camera.shake(0.005,100);
+            this.energy--;
+            platformer.level1.energy.frame = this.energy;
+        }
+        
         this.cursors = this.game.input.keyboard.createCursorKeys();
         this.space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         
-        /*this.entry = this.game.add.sprite(65,268,'entry');
-        this.entry.anchor.setTo(0.5);
-        this.game.physics.arcade.enable(this.hero);
-        this.entry.body.allowGravity = false;*/
-        
         this.camera.follow(this.hero,Phaser.Camera.FOLLOW_PLATFORMER);
+        
+        this.jumper = new platformer.jumper_prefab(this.game,240,304,this,100,1);
+        this.game.add.existing(this.jumper);
+        
+        this.slime = new platformer.slime_prefab(this.game,672,268,this,100,1,645,1024);
+        this.game.add.existing(this.slime);
     },
     update:function(){
-        //this.game.physics.arcade.collide(this.hero,this.entry);
         this.game.physics.arcade.collide(this.hero,this.walls);
         
         this.hero.body.velocity.x = 0;
         
         if(this.cursors.left.isDown){
             this.hero.body.velocity.x = -gameOptions.heroSpeed;
-            if(!this.jumping){
-                this.hero.animations.play("run");
-                this.hero.scale.x = -1;   
-            }
-        }else if(this.cursors.right.isDown){
+            this.hero.animations.play("run");
+            this.hero.scale.x = -1;   
+        }else if(this.cursors.right.isDown){ 
             this.hero.body.velocity.x = gameOptions.heroSpeed;
-             if(!this.jumping){
-                this.hero.animations.play("run");
-                this.hero.scale.x = 1;   
-            }
+            this.hero.animations.play("run");
+            this.hero.scale.x = 1;   
         }else{
-             if(!this.jumping){
-                this.hero.animations.stop();
-                 this.hero.frame = 0;
-            }
+            this.hero.frame = 0;
         }
         
-        if(this.hero.body.onFloor()){
-            this.jumping = false;
-        }
-        
-        
-        if(this.space.isDown && this.hero.body.onFloor() && this.space.downDuration(250)){
+        if(this.space.isDown && this.hero.body.blocked.down && this.space.downDuration(250)){
             this.hero.body.velocity.y = -gameOptions.heroJump;
-            this.hero.animations.stop();
-            this.hero.frame = 5;
-            this.jumping = true;
         }
+        
+        if(!this.hero.body.blocked.down){
+            this.hero.frame = 5;
+        }
+    },
+    hit:function(){
+        this.hero.reset(65,100);
+        this.camera.shake(0.005,100);
+        this.hero.energy--;
+        this.energy.frame = this.hero.energy;
     }
 };
