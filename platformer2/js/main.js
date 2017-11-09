@@ -12,5 +12,13 @@ var gameOptions = {
 };
 
 platformer.game = new Phaser.Game(gameOptions.gameWidth,gameOptions.gameHeight,Phaser.AUTO,null,this,false,false);
+
+WebFontConfig = {
+    active:function(){platformer.time.events.add(Phaser.Timer.SECOND.createText,this);},
+    google:{
+        families:['Press Start 2P']
+    }
+};
+
 platformer.game.state.add('main',platformer.level1);
 platformer.game.state.start('main');

@@ -20,10 +20,13 @@ platformer.level1 = {
         this.load.spritesheet('hero','img/hero.png',32,32);
         
         this.load.image('entry','img/spr_door_closed_0.png');
+        this.load.image('gemUI','img/spr_gui_gem_0.png');
         
         this.load.spritesheet('jumper','img/jumper.png',32,32);
         this.load.spritesheet('slime','img/slime.png',32,32);
         this.load.spritesheet('energy','img/energy.png',128,28);
+        
+        this.game.load.script('webfont','//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
     },
     create:function(){
         this.bg = this.game.add.tileSprite(0,0,gameOptions.level1Width,gameOptions.level1Height,'bg');
@@ -51,10 +54,20 @@ platformer.level1 = {
         
         this.hero.hit = function(){
             this.reset(65,100);
-            platformer.level1.camera.shake(0.005,100);
+            //platformer.level1.camera.shake(0.005,100);
+            platformer.level1.camera.flash('0xFF0000',500);
             this.energy--;
             platformer.level1.energy.frame = this.energy;
         }
+        
+        this.gemUI = this.game.add.image(390,-10,'gemUI');
+        this.gemUI.fixedToCamera = true;
+        this.gemUI.contador = 0;
+        this.gemTextUI = this.game.add.text(440,18,'x' + this.gemUI.contador);
+        this.gemTextUI.font = "Press Start 2P";
+        this.gemTextUI.fill = 'white';
+        this.gemTextUI.fontSize = 16;
+        this.gemTextUI.fixedToCamera = true;
         
         this.cursors = this.game.input.keyboard.createCursorKeys();
         this.space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
