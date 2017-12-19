@@ -48,9 +48,13 @@ platformer.level1 = {
         this.hero.animations.add("run",[1,2,3,4],10,true);
         this.game.physics.arcade.enable(this.hero);
         
-        this.hero.energy = 6;
+        //this.hero.energy = 6;
+        this.resetGame();
         this.energy = this.game.add.sprite(10,10,'energy',this.hero.energy);
         this.energy.fixedToCamera = true;
+        this.gemUI = this.game.add.image(390,-10,'gemUI');
+        this.gemUI.fixedToCamera = true;
+        //this.gemUI.contador = 0;
         
         this.hero.hit = function(){
             this.reset(65,100);
@@ -60,9 +64,7 @@ platformer.level1 = {
             platformer.level1.energy.frame = this.energy;
         }
         
-        this.gemUI = this.game.add.image(390,-10,'gemUI');
-        this.gemUI.fixedToCamera = true;
-        this.gemUI.contador = 0;
+        
         this.gemTextUI = this.game.add.text(440,18,'x' + this.gemUI.contador);
         this.gemTextUI.font = "Press Start 2P";
         this.gemTextUI.fill = 'white';
@@ -109,6 +111,36 @@ platformer.level1 = {
         this.hero.reset(65,100);
         this.camera.shake(0.005,100);
         this.hero.energy--;
-        this.energy.frame = this.hero.energy;
+        //this.energy.frame = this.hero.energy;
+        this.parent.saveGame();
+    },
+    resumeGame:function(){
+        if(!supportLocalStorage() || ((localStorage["saved"]) != "true")){
+            resetGame();
+            return false;
+        }
+        //local storage solo almacena strings
+        this.hero.energy = parseInt(localStorage["energy"]);
+        this.gemUI.contador = parseInt(localStorage["gems"]);
+        return true;
+    },
+    saveGame:function(){
+        if(!this.supportLocalStorage()){
+            this.resetGame();
+            return false;
+        }
+        //local storage solo almacena strings
+        this.localStorage["saved"]=true;
+        this.localStorage["energy"]=this.hero.energy;
+        this.localStorage["gems"]=this.gemUI.contador;
+        return true;
+    },
+    resetGame:function(){
+        this.hero.energy = 6;
+        this.gemUI.contador = 0;
+        return true;
+    },
+    supportLocalStorage:function(){
+        return ('localStorage' in window) && window['localStorage'] !== null; //Check if the web browser supports local storage.
     }
 };
